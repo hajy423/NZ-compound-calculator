@@ -99,6 +99,12 @@
       margin-top: 30px;
       color: #2c3e50;
     }
+
+    #chartPlaceholder {
+      text-align: center;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -129,6 +135,9 @@
   <div class="result" id="result"></div>
 
   <canvas id="growthChart" width="400" height="250"></canvas>
+  <div id="chartPlaceholder">
+    Enter numbers above and click Calculate to see your growth chart
+  </div>
   <small style="display:block; text-align:center; margin-top:5px;">
     Red dashed line shows total saved without interest. The difference highlights the effect of compounding.
   </small>
@@ -144,37 +153,44 @@ function calculate() {
   let rate = (parseFloat(document.getElementById('rate').value) || 0) / 100 / 12;
   let years = parseFloat(document.getElementById('years').value) || 0;
 
+  if (initial === 0 && monthly === 0 && rate === 0 && years === 0) {
+    // Show placeholder if all inputs are empty
+    document.getElementById('chartPlaceholder').style.display = 'block';
+    if (window.myChart) window.myChart.destroy();
+    document.getElementById('result').innerHTML = '';
+    return;
+  }
+
   let months = years * 12;
-  let total = initial * Math.pow(1 + rate, months);
-  if (rate === 0) total += monthly * months;
+  let runningTotal = initial;
+  let runningNoInterest = initial;
 
-  // Show total
-  let resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = "Estimated Total: $" + total.toFixed(2);
-  resultDiv.classList.add('show');
-
-  // Prepare chart data
   let labels = [];
   let data = [];
   let noInterestData = [];
-  let runningTotal = initial;
-  let runningNoInterest = initial;
 
   for (let i = 1; i <= months; i++) {
     runningTotal = runningTotal * (1 + rate) + monthly;
     runningNoInterest += monthly;
 
-    if (i % 12 === 0) { // yearly points
+    if (i % 12 === 0) {
       labels.push(i / 12);
       data.push(runningTotal.toFixed(2));
       noInterestData.push(runningNoInterest.toFixed(2));
     }
   }
 
-  // Remove existing chart if exists
+  // Show final total
+  let resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = "Estimated Total: $" + runningTotal.toFixed(2);
+  resultDiv.classList.add('show');
+
+  // Hide placeholder
+  document.getElementById('chartPlaceholder').style.display = 'none';
+
+  // Remove previous chart if exists
   if (window.myChart) window.myChart.destroy();
 
-  // Create chart
   let ctx = document.getElementById('growthChart').getContext('2d');
   window.myChart = new Chart(ctx, {
     type: 'line',
@@ -195,7 +211,7 @@ function calculate() {
           borderColor: '#e74c3c',
           backgroundColor: 'rgba(231, 76, 60, 0.1)',
           fill: false,
-          borderDash: [5, 5],
+          borderDash: [5,5],
           tension: 0.3
         }
       ]
