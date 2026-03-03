@@ -7,27 +7,39 @@
   <style>
     body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 15px; }
     h2 { text-align: center; }
-    label { display: block; margin-top: 10px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
     input { margin: 5px 0; padding: 8px; width: 100%; box-sizing: border-box; }
     button { padding: 10px 20px; margin-top: 15px; display: block; width: 100%; cursor: pointer; }
     .result { margin-top: 20px; font-weight: bold; font-size: 1.2em; }
+    small { display: block; color: #555; }
+    p { color: #333; }
   </style>
 </head>
 <body>
 
 <h2>NZ Compound Interest Calculator</h2>
 
+<p>
+This tool shows how your money could grow over time. 
+Enter the starting amount, how much you add each month, the yearly interest rate (how much your money earns), 
+and the number of years you plan to save. Then click "Calculate" to see your estimated total.
+</p>
+
 <label>Initial Investment ($)</label>
 <input type="number" id="initial" placeholder="e.g. 5000">
+<small>This is the amount of money you already have to start with, in NZ dollars.</small>
 
 <label>Monthly Contribution ($)</label>
 <input type="number" id="monthly" placeholder="e.g. 200">
+<small>Enter how much money you plan to add every month. Use 0 if you don’t plan to add more.</small>
 
 <label>Annual Interest Rate (%)</label>
 <input type="number" id="rate" placeholder="e.g. 6">
+<small>This is how much your money earns each year. For example, check your savings account, term deposit, or KiwiSaver fund for the yearly growth rate.</small>
 
 <label>Years</label>
 <input type="number" id="years" placeholder="e.g. 10">
+<small>Enter how many years you plan to leave your money invested.</small>
 
 <button onclick="calculate()">Calculate</button>
 
@@ -42,7 +54,7 @@ function calculate() {
 
   let months = years * 12;
 
-  // Future Value Formula
+  // Calculate total with compound interest formula
   let total = initial * Math.pow(1 + rate, months);
   if (rate === 0) {
     total += monthly * months; // no interest
