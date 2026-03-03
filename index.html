@@ -8,6 +8,9 @@
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -87,6 +90,15 @@
     .result.show {
       opacity: 1;
     }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    h3 {
+      margin-top: 30px;
+      color: #2c3e50;
+    }
   </style>
 </head>
 <body>
@@ -116,8 +128,13 @@
 
   <div class="result" id="result"></div>
 
+  <canvas id="growthChart" width="400" height="250"></canvas>
+  <small style="display:block; text-align:center; margin-top:5px;">
+    Red dashed line shows total saved without interest. The difference highlights the effect of compounding.
+  </small>
+
   <h3>How It Works</h3>
-  <p>The calculator uses standard compound interest, adding monthly contributions and applying the yearly interest rate. It assumes contributions are made at the end of each month.</p>
+  <p>This calculator uses standard compound interest: it adds your monthly contributions and applies the annual interest rate. The chart shows how your money grows each year.</p>
 </div>
 
 <script>
@@ -128,18 +145,69 @@ function calculate() {
   let years = parseFloat(document.getElementById('years').value) || 0;
 
   let months = years * 12;
-
-  // Compound interest calculation
   let total = initial * Math.pow(1 + rate, months);
-  if (rate === 0) {
-    total += monthly * months; // no interest
-  } else {
-    total += monthly * (Math.pow(1 + rate, months) - 1) / rate;
-  }
+  if (rate === 0) total += monthly * months;
 
+  // Show total
   let resultDiv = document.getElementById('result');
   resultDiv.innerHTML = "Estimated Total: $" + total.toFixed(2);
   resultDiv.classList.add('show');
+
+  // Prepare chart data
+  let labels = [];
+  let data = [];
+  let noInterestData = [];
+  let runningTotal = initial;
+  let runningNoInterest = initial;
+
+  for (let i = 1; i <= months; i++) {
+    runningTotal = runningTotal * (1 + rate) + monthly;
+    runningNoInterest += monthly;
+
+    if (i % 12 === 0) { // yearly points
+      labels.push(i / 12);
+      data.push(runningTotal.toFixed(2));
+      noInterestData.push(runningNoInterest.toFixed(2));
+    }
+  }
+
+  // Remove existing chart if exists
+  if (window.myChart) window.myChart.destroy();
+
+  // Create chart
+  let ctx = document.getElementById('growthChart').getContext('2d');
+  window.myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Investment Growth Over Years',
+          data: data,
+          borderColor: '#27ae60',
+          backgroundColor: 'rgba(39, 174, 96, 0.2)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Total Saved (No Interest)',
+          data: noInterestData,
+          borderColor: '#e74c3c',
+          backgroundColor: 'rgba(231, 76, 60, 0.1)',
+          fill: false,
+          borderDash: [5, 5],
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: 'Years' } },
+        y: { title: { display: true, text: 'Total ($)' } }
+      }
+    }
+  });
 }
 </script>
 
