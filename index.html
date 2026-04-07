@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compound Interest Calculator</title>
   
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -112,6 +109,46 @@
       text-align: center;
       margin-top: 20px;
     }
+
+    .method-box {
+      background-color: #eaf6f0;
+      border-left: 4px solid #27ae60;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .method-box h4 {
+      margin: 0 0 8px;
+      color: #1e8449;
+      font-size: 0.95em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .method-box p {
+      margin: 0 0 10px;
+      font-size: 0.88em;
+      color: #2c3e50;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    .method-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .formula {
+      background: #ffffff;
+      border: 1px solid #c8e6c9;
+      border-radius: 5px;
+      padding: 10px 14px;
+      font-family: monospace;
+      font-size: 0.85em;
+      color: #1e8449;
+      margin: 8px 0;
+    }
   </style>
 </head>
 <body>
@@ -152,7 +189,22 @@
   <h3>How It Works</h3>
   <p>This calculator uses standard compound interest: it adds your monthly contributions and applies the annual interest rate. The chart shows how your money grows each year.</p>
 
-  <!-- DISCLAIMER -->
+  <div class="method-box">
+    <h4>📅 Monthly compounding is used</h4>
+    <p>
+      This calculator applies interest every month, which matches how most real-world savings accounts, term deposits, and investment funds actually work.
+    </p>
+    <p><strong>How the monthly rate is calculated:</strong></p>
+    <div class="formula">Monthly rate = Annual rate ÷ 12</div>
+    <p>
+      For example, a 6% annual rate becomes <strong>0.5% per month</strong> (6 ÷ 12 = 0.5%). Each month, your contribution is added first, then interest is applied to the combined total:
+    </p>
+    <div class="formula">New balance = (Balance + monthly contribution) × (1 + monthly rate)</div>
+    <p>
+      Your contribution is added first, then interest is applied to the combined amount — meaning your deposit earns interest in the same month it goes in. This is the standard approach used by most savings calculators.
+    </p>
+  </div>
+
   <p class="disclaimer">
     ⚠️ This calculator is for <strong>educational purposes only</strong>. It is <strong>not financial advice</strong>. Actual results may vary and depend on your bank, investments, and market conditions. Always consult a financial professional before making decisions.
   </p>
@@ -185,7 +237,7 @@ function calculate() {
   let noInterestData = [];
 
   for (let i = 1; i <= months; i++) {
-    runningTotal = runningTotal * (1 + rate) + monthly;
+    runningTotal = (runningTotal + monthly) * (1 + rate);
     runningNoInterest += monthly;
 
     if (i % 12 === 0) {
